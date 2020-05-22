@@ -1,0 +1,30 @@
+﻿[QuesitonInfo]
+Id=1001
+Url=http://tiba.jsyks.com/Post/02dec.htm
+Tittle=驾驶机动车在道路上违反道路交通安全法的行为，属于什么行为？
+TittleEmphasize=
+SkillEmphasize=违反道路交通安全法的行为
+ImagePath=
+FlashPath=
+SkillId=31 SkillId
+MoudleId=1 题目模块1~13
+Type=2  题目类型 1判断 2 选择 3 多选
+Classification=3  2货车1客车3小车科目一4所有科目四
+BankId=6 题库分类 
+[SkillInfo]
+SkillNotice=看下面选项：答案中全是行为的直接选违法行为。
+NormalNotice=四个行为就选违法行为。
+[Options]
+Options1=违规行为
+Options2=过失行为
+Options3=违章行为
+Options4=违法行为
+Image1=行为
+Image2=行为
+Image3=行为
+Image4=法
+[AnswerInfo]
+Answer1=0
+Answer2=0
+Answer3=0
+Answer4=1
