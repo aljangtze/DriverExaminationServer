@@ -8,7 +8,7 @@ $result = array("result" => -1, 'status' => "Failed", "data" => "");
 $content = file_get_contents("php://input");
 $dataInfo = json_decode($content, true);
 
-$ret = uploadAnswerQuestions($dataInfo);
+$ret = AddAnswerQuestion($dataInfo);
 
 if ($ret == true) {
     $result['result'] = 1;

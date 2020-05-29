@@ -172,6 +172,42 @@ function uploadAnswerQuestions($data)
     return $result;
 }
 
+
+function AddAnswerQuestion($errorQuestion)
+{
+    $result = ['result' => false, 'post' => 1, 'update' => 0, "insert" => 0, 'error' => ''];
+    global $db;
+    $insertCount = 0;
+    $updateCount = 0;
+    $db->beginTransaction();
+    try {
+            $arr = array_slice($errorQuestion, 0, 2);
+            if ($db->exists("select * from answers where question_id=:question_id and user_id=:user_id", $arr)) {
+                if ($errorQuestion['answerNumber'] != $errorQuestion['rightNumber'] + $errorQuestion['errorNumber'])
+                    return $result;
+
+                $params = array_slice($errorQuestion, 0, 5);
+                $params['lastupdatetime'] = date('Y-m-d h:i:s', time());
+                $sql = 'update answers set answerNumber=:answerNumber+answerNumber, rightNumber=:rightNumber+rightNumber,errorNumber=:errorNumber+errorNumber, lastupdatetime=:lastupdatetime where question_id=:question_id and user_id=:user_id';
+                $updateCount = $updateCount + $db->query($sql, $params);
+            } else {
+                $arr = array_slice($errorQuestion, 0, 5);
+                $arr['lastupdatetime'] = date('Y-m-d h:i:s', time());
+                if ($db->insert('answers', $arr) > 0)
+                    $insertCount = $insertCount + 1;
+        }
+    } catch (Exception $e) {
+        $db->rollback();
+        $result['error'] = $e->getMessage();
+        return $result;
+    }
+
+    $db->commit();
+    $result['result'] = true;
+    $result['update'] = $updateCount;
+    $result['insert'] = $insertCount;
+    return $result;
+}
 //获取答题列表
 function getAnswerQuestions($user_id)
 {
@@ -195,6 +231,7 @@ function addExamAnswer($ExamAnswer)
 {
     try {
         global $db;
+        $ExamAnswer['exam_date'] = date('Y-m-d h:i:s', time());
         //$user = array_slice($ExamAnswer, 1);
         $result = $db->insert("exam_result", $ExamAnswer);
         return $result;

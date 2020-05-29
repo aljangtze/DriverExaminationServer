@@ -38,8 +38,11 @@ if (isset($_GET["subject_id"]) && isset($_GET["car_type"]) && isset($_GET["modul
         for ($i = 1; $i <= $optionNum; $i++) {
             array_push($options, array("answer" => $question['option' . $i], "flag" => $question["answer" . $i], "result" => "0", "keyword" => $question['option' . $i . 'Emphasize']));
         }
-        #打乱答案的顺序
-        shuffle($options);
+
+        if(intval($question["type"])!=1) {
+            #打乱答案的顺序
+            shuffle($options);
+        }
 
         $id = 0;
         $shuffleOptions = [];

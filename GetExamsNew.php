@@ -244,7 +244,7 @@ function getQuestionIdByRule($chapterCountRule, $typeRules, $group_ids, $start)
         if ($questionCount > 0) {
             $data = getGroupsQuestions($group_ids, $questionType);
 
-            shuffle($data);
+             shuffle($data);
 
             //某类题目的列表
             $questionIdList = getQuestionsId($chapterCountRule, $data, $questionCount, $start);
@@ -288,7 +288,8 @@ function getQuestionInfo($questionIdList, $index)
             array_push($options, array("answer" => $question['option' . $i], "flag" => $question["answer" . $i], "result" => "0", "keyword" => $question['option' . $i . 'Emphasize']));
         }
         #打乱答案的顺序
-        shuffle($options);
+        if($question['type'] != 1)
+            shuffle($options);
 
         $id = 0;
         $shuffleOptions = [];
