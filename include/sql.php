@@ -220,9 +220,9 @@ function getUserlist($user_id)
 {
     global $db;
     if ($user_id != "0" || $user_id != 0) {
-        return $db->fetchAll("SELECT id as ID,name , password, type , case status when 1 then 'true' else 'false' end as status, real_name, school_name, register_date, device_count FROM users where id=:user_id", ["user_id" => $user_id]);
+        return $db->fetchAll("SELECT id as ID,name , password, type , case status when 1 then 'true' else 'false' end as status, real_name, school_name,learn_subject, register_date, device_count FROM users where id=:user_id", ["user_id" => $user_id]);
     } else {
-        return $db->fetchAll("SELECT id as ID,name , password, type , case status when 1 then 'true' else 'false' end as status, real_name, school_name, register_date, device_count FROM users ");
+        return $db->fetchAll("SELECT id as ID,name , password, type , case status when 1 then 'true' else 'false' end as status, real_name, school_name, learn_subject, register_date, device_count FROM users ");
     }
 
 }
