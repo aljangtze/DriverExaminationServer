@@ -12,7 +12,6 @@ if(isset($_GET["device_code"]))
     $device = $_GET["device_code"];
     $user  =  loginUseDevice($device);
     if($user) {
-        //$session->login($user["id"]);
         //登录成功，传回token
         $result['result']=1;
         $result['status']="Success";
@@ -22,7 +21,7 @@ if(isset($_GET["device_code"]))
     }
     else
     {
-        $result['data']="user info is error";
+        $result['data']="login failed";
         echo json_encode($result);
         return;
     }
