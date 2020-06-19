@@ -19,12 +19,15 @@ if (isset($_GET["subject_id"]) && isset($_GET["car_type"]) && isset($_GET["modul
     $car_type = $_GET["car_type"];
     $subject_id = $_GET["subject_id"];
     $module_id = $_GET["module_id"];
+    $user_id = $_GET["user_id"];
 
-    $data = getGroups($car_type, $subject_id, $module_id);
+    $data = getGroups($car_type, $subject_id, $module_id, $user_id);
+
     echo json_encode($data);
-} else if (isset($_GET["id"])) {
+} else if (isset($_GET["id"])&& isset($_GET["user_id"])) {
     $group_id = $_GET["id"];
-    $data = getGroupQuestions($group_id);
+    $user_id= $_GET["user_id"];
+    $data = getGroupQuestions($group_id, $user_id);
 
     $index= 0;
     $questionList = [];
@@ -58,6 +61,5 @@ if (isset($_GET["subject_id"]) && isset($_GET["car_type"]) && isset($_GET["modul
     }
 
     echo json_encode($questionList);
-
 }
 ?>

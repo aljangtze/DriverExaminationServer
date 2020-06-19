@@ -208,6 +208,22 @@ function AddAnswerQuestion($errorQuestion)
     $result['insert'] = $insertCount;
     return $result;
 }
+
+//删除服务器上的答题结果
+function DeleteAnswer($user)
+{
+    try {
+        global $db;
+        $id = $user["ID"];
+
+        $sql = 'delete from answers where user_id=:user_id';
+        $result = $db->query($sql, ["user_id" => $id]);
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
 //获取答题列表
 function getAnswerQuestions($user_id)
 {
@@ -286,7 +302,7 @@ function deleteUser($user)
     }
 }
 
-function getGroups($car_type, $subject_id, $group_type)
+function getGroups($car_type, $subject_id, $group_type, $user_id)
 {
     //car_type 0 小车 1客车 2 货车 3摩托车 车辆类型
     //subject_id 0 科目一 1科目四 科目类型
@@ -330,8 +346,8 @@ function getGroups($car_type, $subject_id, $group_type)
     global $db;
     //$sql = "select rowid as 'index', id, name as tittle, :car_type as car_type, :subject_id as subject_id, count from groups where type=:group_id and classification in ".$classification;
     $sql = "select  g.rowid as 'index', g.id,g.name as tittle,  
-            :car_type as car_type, :subject_id as subject_id, 
-            count(gq.question_id) as count
+            :car_type as car_type, :subject_id as subject_id, g.classification,g.vip,
+            count(gq.question_id) as count,sql, sql_parameter
             from groups as g 
             left join group_questions as gq on gq.group_id=g.id and gq.type=g.type
                         left join classfication as c on g.classification=c.id
@@ -339,13 +355,65 @@ function getGroups($car_type, $subject_id, $group_type)
             where g.type=:group_type and classification in" . $classification . "
             group by g.id,g.name,g.type, g.classification, g.status order by g.name";
     $parameter = ['car_type' => $car_type, 'subject_id' => $subject_id, 'group_type' => $group_type];
-    return $db->fetchAll($sql, $parameter);
+
+    $data = $db->fetchAll($sql, $parameter);
+
+
+    $returnData = Array();
+    if($group_type == 3) {
+        foreach ($data as $row) {
+
+            $sqlInfo = $row['sql'];
+
+            $sqlInfo = str_replace('{0}', $user_id, $sqlInfo);
+            $sqlInfo = str_replace('{1}', $row['classification'], $sqlInfo);
+            $sqlInfo = str_replace('{2}', $row['sql_parameter'], $sqlInfo);
+            $sqlInfo = str_replace(';', '', $sqlInfo);
+
+            $sqlQuery = 'select count(1) as count from (' . $sqlInfo . ')';
+
+            $countInfo = $db->fetch($sqlQuery);
+
+            $row['count'] = $countInfo['count'];
+            $row['sql'] = '';
+
+            array_push($returnData, $row);
+        }
+    }
+    else
+    {
+        $returnData = $data;
+    }
+
+    return $returnData;
 }
 
 
-function getGroupQuestions($group_id)
+function getGroupQuestions($group_id, $user_id)
 {
     global $db;
+
+    $sql = "select * from groups where id=:group_id";
+    $groupInfo = $db->fetch($sql, ["group_id" => $group_id]);
+
+    if($groupInfo['type'] == 3) {
+
+        $sqlInfo = $groupInfo['sql'];
+
+        $sqlInfo = str_replace('{0}', $user_id, $sqlInfo);
+        $sqlInfo = str_replace('{1}', $groupInfo['classification'], $sqlInfo);
+        $sqlInfo = str_replace('{2}', $groupInfo['sql_parameter'], $sqlInfo);
+        $sqlInfo = str_replace(';', '', $sqlInfo);
+
+        $sqlQuery = 'select q.id, q.tittle, q.type, q.option1, q.option2, q.option3, q.option4, q.answer1, q.answer2, q.answer3, q.answer4, 
+            q.tittleEmphasize, q.skillEmphasize, q.notice, q.option1Emphasize, q.option2Emphasize, q.option3Emphasize, q.option4Emphasize,
+            case when image is null then \'\' else id||\'.jpg\' end as image,case when flash is null then \'\' else id||\'.mp4\' end as flash 
+            from questions as q inner join (' . $sqlInfo . ') as gq 
+            on gq.question_id=q.id';
+
+        return $db->fetchAll($sqlQuery);
+    }
+
     $sql = "select q.id, q.tittle, q.type, q.option1, q.option2, q.option3, q.option4, q.answer1, q.answer2, q.answer3, q.answer4, 
             q.tittleEmphasize, q.skillEmphasize, q.notice, q.option1Emphasize, q.option2Emphasize, q.option3Emphasize, q.option4Emphasize,
             case when image is null then '' else id||'.jpg' end as image,case when flash is null then '' else id||'.mp4' end as flash 
