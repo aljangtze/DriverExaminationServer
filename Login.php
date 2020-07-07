@@ -9,6 +9,7 @@ require_once('include/load.php');
 
 if(isset($_GET["device_code"]))
 {
+    //微信登录
     $device = $_GET["device_code"];
     $user  =  loginUseDevice($device);
     if($user) {

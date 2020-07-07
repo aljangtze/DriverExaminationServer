@@ -36,12 +36,11 @@ function login($user, $password, $device)
 
         //检查当前设备是否已经记录
         $sql = "select * from user_device as ud
-        left join devices  as d on ud.device_id=d.id
+        inner join devices  as d on ud.device_id=d.id
         where d.guid ='{$device}' and ud.user_id={$userInfo["id"]}";
 
         $deviceInfo = $db->fetch($sql);
         if ($deviceInfo) {
-
             $resultData['info'] = "Success";
             $resultData['data'] = $userInfo;
             $resultData['result'] = 1;
@@ -54,7 +53,7 @@ function login($user, $password, $device)
         $registerCount = $db->fetch($sql);
 
         if ($userInfo["device_count"] > $registerCount["count"]) {
-            //添加
+            //添加设备绑定
             bindUserDevice($userInfo["id"], $device);
             $resultData['result'] = 1;
             $resultData['info'] = "Success";
@@ -62,7 +61,6 @@ function login($user, $password, $device)
         } else {
             $resultData['info'] = "最大允许登录的设备数不足";
             return $resultData;
-            //return false;
         }
 
     } catch (Exception $e) {
@@ -76,13 +74,26 @@ function bindUserDevice($user_id, $device_id, $type=0)
 {
     try {
         global $db;
-        $sql = "insert into devices (guid, type, is_super) values ('{$device_id}', 0, 0)";
 
-        $db->insert('devices', ["guid" => $device_id, "type" => $type, "is_super" => "0"]);
+        if($device_id == null)
+            return false;
 
-        $sql = "insert into user_device (user_id, device_id) select {$user_id},id from devices where guid ='{$device_id}'";
+        $sql = "select * from devices where guid = '{$device_id}'";
+        $result = $db->query($sql);
+        $isExists = ($db->num_rows($result) === 0 ? false : true);
 
-        $db->query($sql);
+        if($isExists == false) {
+            $sql = "insert into devices (guid, type, is_super) values ('{$device_id}', 0, 0)";
+            $db->insert('devices', ["guid" => $device_id, "type" => $type, "is_super" => "0"]);
+        }
+
+        $sql = "select * user_device where device_id in (select id from devices where guid = '{$device_id}') and user_id={$user_id}";
+        $result = $db->query($sql);
+        $isExists = ($db->num_rows($result) === 0 ? false : true);
+        if($isExists == false) {
+            $sql = "insert into user_device (user_id, device_id) select {$user_id},id from devices where guid ='{$device_id}'";
+            $db->query($sql);
+        }
     } catch (Exception $e) {
         return false;
     }
@@ -96,7 +107,7 @@ function loginUseDevice($device)
         $sql = "select * from users as u  
                     where u.id in (
                                 select ud.user_id from user_device as ud 
-                    left join devices  as d on ud.device_id=d.id
+                    inner join devices  as d on ud.device_id=d.id
                     where d.guid ='{$device}') limit 1";
 
         //$sql = "select user_id from user_deivce where name='{$user}' and password='{$password}' and status=1 limit 1";
