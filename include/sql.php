@@ -75,22 +75,14 @@ function bindUserDevice($user_id, $device_id, $type=0)
     try {
         global $db;
 
-        if($device_id == null)
-            return false;
-
         $sql = "select * from devices where guid = '{$device_id}'";
-        $result = $db->query($sql);
-        $isExists = ($db->num_rows($result) === 0 ? false : true);
-
-        if($isExists == false) {
+        if(!$db->exists($sql)){
             $sql = "insert into devices (guid, type, is_super) values ('{$device_id}', 0, 0)";
-            $db->insert('devices', ["guid" => $device_id, "type" => $type, "is_super" => "0"]);
+            $db->query($sql);
         }
 
-        $sql = "select * user_device where device_id in (select id from devices where guid = '{$device_id}') and user_id={$user_id}";
-        $result = $db->query($sql);
-        $isExists = ($db->num_rows($result) === 0 ? false : true);
-        if($isExists == false) {
+        $sql = "select * from user_device where device_id in (select id from devices where guid = '{$device_id}') and user_id={$user_id}";
+        if(!$db->exists($sql)){
             $sql = "insert into user_device (user_id, device_id) select {$user_id},id from devices where guid ='{$device_id}'";
             $db->query($sql);
         }
