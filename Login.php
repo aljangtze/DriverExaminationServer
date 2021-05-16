@@ -53,20 +53,27 @@ if(!property_exists($userInfo, 'Name') || !property_exists($userInfo, 'Password'
 $username = $userInfo->Name;
 $password = $userInfo->Password;
 
-$resultData  =  login($username, $password, $userInfo->device_id);
+try {
+    $resultData  =  login($username, $password, $userInfo->device_id);
 
-if($resultData['result'] == 1) {
-    //$session->login($user["id"]);
-    //登录成功，传回token
-    $result['result']=1;
-    $result['status']="Success";
-    $result['data'] = $resultData['data'];
-    //echo json_encode();
-    echo json_encode($result);
-}
-else
-{
-    $result['data']=$resultData['info'];
+    if($resultData['result'] == 1) {
+        //$session->login($user["id"]);
+        //登录成功，传回token
+        $result['result']=1;
+        $result['status']="Success";
+        $result['data'] = $resultData['data'];
+        //echo json_encode();
+        echo json_encode($result);
+    }
+    else
+    {
+        $result['data']=$resultData['info'];
+        echo json_encode($result);
+        return;
+    }
+
+} catch (Exception $e) {
+    $result['data']=$e->getMessage();
     echo json_encode($result);
     return;
 }

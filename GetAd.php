@@ -1,5 +1,5 @@
 <?php
-	$host= 'https://smallprogram.xsjwang.com/ad_Images/';
+	$host= 'https://www.yuntpcr.com.cn/ad_Images/';
 	function listDir($dir, $host)
 	{
 		$array = array();
