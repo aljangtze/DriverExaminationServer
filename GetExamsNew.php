@@ -83,6 +83,7 @@ $busRecoverRule = [20, 10, 10, 5, 0, 5];
 $trunkRecoverRule = [20, 10, 10, 5, 5, 0];
 
 //抽题类型比例,恢复资格考试
+// 多选 判断 单选
 $recoverExam = [0, 20, 30];
 $simulateExam0Rule = [0, 40, 60];
 
@@ -98,7 +99,7 @@ $simulateExam1Rule = [10, 20, 20];
 $Moter0Rule = [100];
 $Moter1Rule = [50];
 $moter0Exam = [0, 40, 60];
-$moter1Exam = [0, 20, 30];
+$moter1Exam = [10, 20, 20];
 //$moterRecoverExam = [0, 20, 30];
 
 

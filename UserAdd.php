@@ -12,7 +12,7 @@ $dataInfo = json_decode($content, true);
 //$type = $_GET["type"];
 //echo "hello";
 
-$ret = AddUser($dataInfo);
+$ret = addUser($dataInfo);
 
 if ($ret == true) {
     $result['result'] = 1;
